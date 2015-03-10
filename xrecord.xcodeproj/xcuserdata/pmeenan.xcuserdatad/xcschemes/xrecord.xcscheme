@@ -61,6 +61,14 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "--name=&quot;Pat&apos;s iPhone&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--force"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--time=10"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -68,12 +76,12 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--out=&quot;/Users/pmeenan/video/iphone.mov&quot;"
-            isEnabled = "NO">
+            argument = "--out=&quot;/Users/pmeenan/video/iphone.mp4&quot;"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--list"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

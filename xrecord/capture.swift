@@ -89,7 +89,6 @@ func captureOutput(captureOutput: AVCaptureFileOutput!,
     didFinishRecordingToOutputFileAtURL outputFileURL: NSURL!,
     fromConnections connections: [AnyObject]!,
     error: NSError!) {
-    println("captureOutputCallback")
 }
 
 } // class Capture

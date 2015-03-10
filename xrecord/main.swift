@@ -19,6 +19,8 @@ let id = StringOption(shortFlag: "i", longFlag: "id", required: false,
     helpMessage: "Device ID.")
 let outFile = StringOption(shortFlag: "o", longFlag: "out", required: false,
     helpMessage: "Output File.")
+let force = BoolOption(shortFlag: "f", longFlag: "force",
+    helpMessage: "Overwrite existing files.")
 let qt = BoolOption(shortFlag: "q", longFlag: "quicktime",
     helpMessage: "Start QuickTime in the background (necessary for iOS recording.")
 let time = IntOption(shortFlag: "t", longFlag: "time", required: false,
@@ -28,7 +30,7 @@ let help = BoolOption(shortFlag: "h", longFlag: "help",
 let verbosity = CounterOption(shortFlag: "v", longFlag: "verbose",
     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 
-cli.addOptions(list, name, id, outFile, qt, time, help, verbosity)
+cli.addOptions(list, name, id, outFile, force, qt, time, help, verbosity)
 let (success, error) = cli.parse()
 if !success {
     println(error!)
@@ -77,7 +79,26 @@ if name.value != nil {
     }
 }
 
+// See if a video file already exists in the given location
+if outFile.value != nil && NSFileManager.defaultManager().fileExistsAtPath(outFile.value!) {
+    if force.value {
+        var error:NSError?
+        NSFileManager.defaultManager().removeItemAtPath(outFile.value!, error: &error)
+        if (error != nil) {
+            println("Error overwriting existing file (\(error)).")
+            exit(2)
+        }
+    } else {
+        println("The output file already exists, please use a different file: \(outFile.value!)")
+        exit(2)
+    }
+}
+
+
+XRecord_Bridge.installSignalHandler()
+
 capture.start(outFile.value)
+let start = NSDate()
 if time.value != nil && time.value > 0 {
     println("Recording for \(time.value) seconds.  Hit ctrl-C to stop.")
     sleep(UInt32(time.value!))
@@ -85,5 +106,21 @@ if time.value != nil && time.value > 0 {
     println("Recording started.  Hit ctrl-C to stop.")
     sleep(10)
 }
+
+// Loop until we get a ctrl-C or the time limit expires
+var done = false
+do {
+    usleep(100)
+    if XRecord_Bridge.didSignal() {
+        done = true
+    } else if time.value != nil && time.value > 0 {
+        let now = NSDate()
+        let elapsed: Double = now.timeIntervalSinceDate(start)
+        if elapsed >= Double(time.value!) {
+            done = true
+        }
+    }
+} while !done
+
 capture.stop()
 println("Done")
