@@ -1,5 +1,9 @@
 ## xrecord - Capture video on OS X from the command line (including iOS devices)
 
+## System Requirements
+
+To record from iOS it requires an iOS 8.x+ device connected with a lightning connector and OS X Yosemite (10.10) or later.
+
 ## Getting started
 
 ```
@@ -41,3 +45,6 @@ $ xrecord --quicktime --name="iPhone" --out="/Users/blah/video/iphone.mp4" --for
 Recording started.  Hit ctrl-C to stop.
 Done
 ```
+
+## Known Issues
+* Screen orientation changes stops video capture
