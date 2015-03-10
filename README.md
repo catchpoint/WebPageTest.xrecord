@@ -1,12 +1,43 @@
-# xrecord
+## xrecord - Capture video on OS X from the command line (including iOS devices)
 
-Still working through the kinks but this is a command-line utility for capturing video on OS X.
+## Getting started
 
+```
+brew install coming soon.  In the meantime, use the xrecord binary from the /bin directory
+```
 
-More importantly, With 10.10.2 (Yosemite) or later and iOS 8+ devices connected by lightning cable it can capture video from iOS devices that are connected to the Mac.
+## Command line
 
+### Help
+```bash
+$ xrecord --help
+```
 
-Right now there is a limitation that Quicktime needs to be running with a new capture window (can be audio) otherwise iOS devices don't show in the list (open ticket with Apple to figure out why).
+### Options
+* **-l, --list**: List available capture devices.
+* **-n, --name**: Device Name.
+* **-i, --id**: Device ID.
+* **-o, --out**: Output File.
+* **-f, --force**: Overwrite existing files.
+* **-q, --quicktime**: Start QuickTime in the background (necessary for iOS recording).
+* **-t, --time**: Recording time in seconds (records until stopped if not specified).
+* **-d, --debug**: Display debugging info to stderr.
+* **-h, --help**: Prints a help message.
 
+### Examples
 
-Capture is also hard-coded to 10 seconds right now.  The plan is to have it accept a sigint (ctrl-c) and terminate recording based on that.
+#### List available capture devices
+```bash
+$ xrecord --quicktime --list
+Available capture devices:
+AppleHDAEngineInput:1B,0,1,0:1: Built-in Microphone
+5f355a5b183b2d2d7ba91dcfadd4c14b98504642: iPhone
+CC2437519T1F6VVDH: FaceTime HD Camera
+```
+
+#### Record video from iPhone
+```bash
+$ xrecord --quicktime --name="iPhone" --out="/Users/blah/video/iphone.mp4" --force
+Recording started.  Hit ctrl-C to stop.
+Done
+```
