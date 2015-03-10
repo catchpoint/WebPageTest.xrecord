@@ -47,4 +47,5 @@ Done
 ```
 
 ## Known Issues
+* Start of actual recording can lag by up to 3 seconds and may truncate at the end.  Leave some time on either end of the activity being recorded for capture lag.
 * Screen orientation changes stops video capture
