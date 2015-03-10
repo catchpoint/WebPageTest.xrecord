@@ -14,6 +14,8 @@ class Capture: NSObject, AVCaptureFileOutputRecordingDelegate {
 var session : AVCaptureSession!
 var input : AVCaptureDeviceInput?
 var output : AVCaptureMovieFileOutput!
+var started : Bool = false
+var finished : Bool = false
 
 override init() {
     self.session = AVCaptureSession()
@@ -84,11 +86,20 @@ func stop() {
     self.output.stopRecording()
     self.session.stopRunning()
 }
+
+func captureOutput(captureOutput: AVCaptureFileOutput!,
+    didStartRecordingToOutputFileAtURL fileURL: NSURL!,
+    fromConnections connections: [AnyObject]!) {
+    NSLog("captureOutput Started callback");
+    self.started = true
+}
     
 func captureOutput(captureOutput: AVCaptureFileOutput!,
     didFinishRecordingToOutputFileAtURL outputFileURL: NSURL!,
     fromConnections connections: [AnyObject]!,
     error: NSError!) {
+    NSLog("captureOutput Finished callback")
+    self.finished = true
 }
 
 } // class Capture

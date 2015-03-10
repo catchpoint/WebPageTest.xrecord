@@ -22,15 +22,15 @@ let outFile = StringOption(shortFlag: "o", longFlag: "out", required: false,
 let force = BoolOption(shortFlag: "f", longFlag: "force",
     helpMessage: "Overwrite existing files.")
 let qt = BoolOption(shortFlag: "q", longFlag: "quicktime",
-    helpMessage: "Start QuickTime in the background (necessary for iOS recording.")
+    helpMessage: "Start QuickTime in the background (necessary for iOS recording).")
 let time = IntOption(shortFlag: "t", longFlag: "time", required: false,
     helpMessage: "Recording time in seconds (records until stopped if not specified).")
+let debug = BoolOption(shortFlag: "d", longFlag: "debug",
+    helpMessage: "Display debugging info to stderr.")
 let help = BoolOption(shortFlag: "h", longFlag: "help",
     helpMessage: "Prints a help message.")
-let verbosity = CounterOption(shortFlag: "v", longFlag: "verbose",
-    helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 
-cli.addOptions(list, name, id, outFile, force, qt, time, help, verbosity)
+cli.addOptions(list, name, id, outFile, force, qt, time, debug, help)
 let (success, error) = cli.parse()
 if !success {
     println(error!)
@@ -94,17 +94,34 @@ if outFile.value != nil && NSFileManager.defaultManager().fileExistsAtPath(outFi
     }
 }
 
+// If we were not launched with the debug flag, re-spawn and suppress stderr
+if !debug.value {
+    let proc = NSTask()
+    var args = Process.arguments
+    proc.launchPath = args[0]
+    args.append("--debug")
+    proc.arguments = args
+    proc.standardError = NSPipe()
+    proc.launch()
+    XRecord_Bridge.installSignalHandler(proc.processIdentifier)
+    proc.waitUntilExit()
+    exit(proc.terminationStatus)
+}
 
-XRecord_Bridge.installSignalHandler()
+// Start a real capture
+XRecord_Bridge.installSignalHandler(0)
 
+NSLog("Starting capture....")
 capture.start(outFile.value)
+
 let start = NSDate()
 if time.value != nil && time.value > 0 {
-    println("Recording for \(time.value) seconds.  Hit ctrl-C to stop.")
+    println("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
+    NSLog("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
     sleep(UInt32(time.value!))
 } else {
     println("Recording started.  Hit ctrl-C to stop.")
-    sleep(10)
+    NSLog("Recording started.  Hit ctrl-C to stop.")
 }
 
 // Loop until we get a ctrl-C or the time limit expires
@@ -122,5 +139,9 @@ do {
     }
 } while !done
 
+println("Stopping recording...")
+NSLog("Stopping recording...")
+
 capture.stop()
 println("Done")
+NSLog("Done")

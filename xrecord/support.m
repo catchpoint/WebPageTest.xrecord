@@ -11,10 +11,13 @@
 #import <CoreMediaIO/CMIOHardware.h>
 
 BOOL signaled = NO;
+int child_process = 0;
 static void signalHandler(int sig)
 {
-    NSLog(@"Signaled");
     signaled = YES;
+    if (child_process != 0) {
+        kill(child_process, sig);
+    }
 }
 
 void onUncaughtException(NSException* exception)
@@ -54,8 +57,9 @@ void onUncaughtException(NSException* exception)
     CMIOObjectSetPropertyData(kCMIOObjectSystemObject, &prop, 0, NULL, sizeof(allow), &allow);
 }
 
-+ (void) installSignalHandler
++ (void) installSignalHandler:(int)child_pid
 {
+    child_process = child_pid;
     NSSetUncaughtExceptionHandler(&onUncaughtException);
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);
