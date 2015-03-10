@@ -19,12 +19,16 @@ let id = StringOption(shortFlag: "i", longFlag: "id", required: false,
     helpMessage: "Device ID.")
 let outFile = StringOption(shortFlag: "o", longFlag: "out", required: false,
     helpMessage: "Output File.")
+let qt = BoolOption(shortFlag: "q", longFlag: "quicktime",
+    helpMessage: "Start QuickTime in the background (necessary for iOS recording.")
+let time = IntOption(shortFlag: "t", longFlag: "time", required: false,
+    helpMessage: "Recording time in seconds (records until stopped if not specified).")
 let help = BoolOption(shortFlag: "h", longFlag: "help",
     helpMessage: "Prints a help message.")
 let verbosity = CounterOption(shortFlag: "v", longFlag: "verbose",
     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 
-cli.addOptions(list, name, id, outFile, help, verbosity)
+cli.addOptions(list, name, id, outFile, qt, time, help, verbosity)
 let (success, error) = cli.parse()
 if !success {
     println(error!)
@@ -45,6 +49,11 @@ if !list.value {
 if !ok {
     cli.printUsage()
     exit(EX_USAGE)
+}
+
+// See if we need to launch quicktime in the background
+if qt.value {
+    XRecord_Bridge.startQuickTime()
 }
 
 let capture = Capture()
@@ -69,7 +78,12 @@ if name.value != nil {
 }
 
 capture.start(outFile.value)
-println("Capture Started")
-sleep(10)
+if time.value != nil && time.value > 0 {
+    println("Recording for \(time.value) seconds.  Hit ctrl-C to stop.")
+    sleep(UInt32(time.value!))
+} else {
+    println("Recording started.  Hit ctrl-C to stop.")
+    sleep(10)
+}
 capture.stop()
 println("Done")

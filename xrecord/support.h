@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 
 @interface XRecord_Bridge : NSObject
++ (void) startQuickTime;
 + (void) enableScreenCaptureDevices;
 @end
 
