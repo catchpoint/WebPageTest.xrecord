@@ -111,37 +111,79 @@ if !debug.value {
 // Start a real capture
 XRecord_Bridge.installSignalHandler(0)
 
-NSLog("Starting capture....")
-capture.start(outFile.value)
+// Use a distributed lock to make sure only one instance is capturing at a time.
+// Currently OSX only supports recording from a single device at a time.
+let lock = NSDistributedLock(path: "/tmp/xrecord.lck")
+var locked = false
+var done = false
+var started_wait = false
+let lock_start = NSDate()
+do {
+  locked = lock!.tryLock()
+  if !locked {
+    // see if we timed out waiting for the lock (5 minutes - TODO: make it configurable)
+    let now = NSDate()
+    let elapsed: Double = now.timeIntervalSinceDate(lock_start)
+    if elapsed > 300 {
+      println("Timed out waiting to acquire lock")
+      NSLog("Timed out waiting to acquire lock")
+      exit(2)
+    }
+    
+    // if the lock was originally acquired over 10 minutes ago, break it
+    let lock_time = lock!.lockDate
+    let lock_elapsed: Double = now.timeIntervalSinceDate(lock_time)
+    if lock_elapsed > 600 {
+      NSLog("Breaking existing lock")
+      lock!.breakLock()
+    }
+  }
+  if !locked && !done {
+    if !started_wait {
+      println("Waiting to acquire recording lock (only one recording is possible at a time)...")
+      started_wait = true
+    }
+    sleep(1)
+  }
+} while !locked && !done
 
-let start = NSDate()
-if time.value != nil && time.value > 0 {
-    println("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
-    NSLog("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
-    sleep(UInt32(time.value!))
-} else {
-    println("Recording started.  Hit ctrl-C to stop.")
-    NSLog("Recording started.  Hit ctrl-C to stop.")
+if !done {
+  NSLog("Starting capture....")
+  capture.start(outFile.value)
+
+  let start = NSDate()
+  if time.value != nil && time.value > 0 {
+      println("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
+      NSLog("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
+      sleep(UInt32(time.value!))
+  } else {
+      println("Recording started.  Hit ctrl-C to stop.")
+      NSLog("Recording started.  Hit ctrl-C to stop.")
+  }
+
+  // Loop until we get a ctrl-C or the time limit expires
+  do {
+      usleep(100)
+      if XRecord_Bridge.didSignal() {
+          done = true
+      } else if time.value != nil && time.value > 0 {
+          let now = NSDate()
+          let elapsed: Double = now.timeIntervalSinceDate(start)
+          if elapsed >= Double(time.value!) {
+              done = true
+          }
+      }
+  } while !done
+
+  println("Stopping recording...")
+  NSLog("Stopping recording...")
+
+  capture.stop()
 }
 
-// Loop until we get a ctrl-C or the time limit expires
-var done = false
-do {
-    usleep(100)
-    if XRecord_Bridge.didSignal() {
-        done = true
-    } else if time.value != nil && time.value > 0 {
-        let now = NSDate()
-        let elapsed: Double = now.timeIntervalSinceDate(start)
-        if elapsed >= Double(time.value!) {
-            done = true
-        }
-    }
-} while !done
+if locked {
+  lock!.unlock()
+}
 
-println("Stopping recording...")
-NSLog("Stopping recording...")
-
-capture.stop()
 println("Done")
 NSLog("Done")
