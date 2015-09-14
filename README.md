@@ -25,6 +25,7 @@ $ xrecord --help
 * **-f, --force**: Overwrite existing files.
 * **-q, --quicktime**: Start QuickTime in the background (necessary for iOS recording).
 * **-t, --time**: Recording time in seconds (records until stopped if not specified).
+* **-u, --quality**: Recoding quality (low, medium, high, photo - defaults to high).
 * **-d, --debug**: Display debugging info to stderr.
 * **-h, --help**: Prints a help message.
 
