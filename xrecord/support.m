@@ -11,6 +11,7 @@
 #import <CoreMediaIO/CMIOHardware.h>
 
 BOOL signaled = NO;
+BOOL started_quicktime = NO;
 int child_process = 0;
 static void signalHandler(int sig)
 {
@@ -39,9 +40,22 @@ void onUncaughtException(NSException* exception)
             if ([[document name] isEqualToString:@"Audio Recording"])
                 already_running = YES;
         }
-        if (already_running == NO)
+        if (already_running == NO) {
+            started_quicktime = YES;
             [qt newAudioRecording];
+        }
     }
+}
+
++ (void) stopQuickTime
+{
+  @autoreleasepool
+  {
+    if (started_quicktime == YES) {
+      QuickTimeApplication * qt = [SBApplication applicationWithBundleIdentifier:@"com.apple.QuickTimePlayerX"];
+      [qt quitSaving:QuickTimeSaveOptionsNo];
+    }
+  }
 }
 
 + (void) enableScreenCaptureDevices

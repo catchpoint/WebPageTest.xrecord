@@ -33,79 +33,82 @@ let help = BoolOption(shortFlag: "h", longFlag: "help",
 cli.addOptions(list, name, id, outFile, force, qt, time, debug, help)
 let (success, error) = cli.parse()
 if !success {
-    println(error!)
-    cli.printUsage()
-    exit(EX_USAGE)
+  println(error!)
+  cli.printUsage()
+  exit(EX_USAGE)
 }
 
 // Check to make sure a sane combination of options were specified
 var ok = true
 if !list.value {
-    if name.value == nil && id.value == nil {
-        ok = false
-    }
-    if outFile.value == nil {
-        ok = false
-    }
+  if name.value == nil && id.value == nil {
+    ok = false
+  }
+  if outFile.value == nil {
+    ok = false
+  }
 }
 if !ok {
-    cli.printUsage()
-    exit(EX_USAGE)
+  cli.printUsage()
+  exit(EX_USAGE)
 }
 
 // See if we need to launch quicktime in the background
 if qt.value {
-    XRecord_Bridge.startQuickTime()
+  XRecord_Bridge.startQuickTime()
 }
 
 let capture = Capture()
 if list.value {
-    println("Available capture devices:")
-    capture.listDevices()
-    exit(0)
+  println("Available capture devices:")
+  capture.listDevices()
+  if qt.value {
+    XRecord_Bridge.stopQuickTime()
+  }
+  exit(0)
 }
 
 // Set up the input device
 if id.value != nil {
-    if !capture.setDeviceById(id.value) {
-        println("Device not found")
-        exit(1)
-    }
+  if !capture.setDeviceById(id.value) {
+    println("Device not found")
+    exit(1)
+  }
 }
 if name.value != nil {
-    if !capture.setDeviceByName(name.value) {
-        println("Device not found")
-        exit(1)
-    }
+  if !capture.setDeviceByName(name.value) {
+    println("Device not found")
+    exit(1)
+  }
 }
 
 // See if a video file already exists in the given location
 if outFile.value != nil && NSFileManager.defaultManager().fileExistsAtPath(outFile.value!) {
-    if force.value {
-        var error:NSError?
-        NSFileManager.defaultManager().removeItemAtPath(outFile.value!, error: &error)
-        if (error != nil) {
-            println("Error overwriting existing file (\(error)).")
-            exit(2)
-        }
-    } else {
-        println("The output file already exists, please use a different file: \(outFile.value!)")
-        exit(2)
+  if force.value {
+    var error:NSError?
+    NSFileManager.defaultManager().removeItemAtPath(outFile.value!, error: &error)
+    if (error != nil) {
+      println("Error overwriting existing file (\(error)).")
+      exit(2)
     }
+  } else {
+    println("The output file already exists, please use a different file: \(outFile.value!)")
+    exit(2)
+  }
 }
 
 // If we were not launched with the debug flag, re-spawn and suppress stderr
 if !debug.value {
-    let proc = NSTask()
-    var args = Process.arguments
-    proc.launchPath = args[0]
-    args.append("--debug")
-    proc.arguments = args
-    proc.standardError = NSPipe()
-    proc.launch()
-    XRecord_Bridge.installSignalHandler(proc.processIdentifier)
-    proc.waitUntilExit()
-    exit(proc.terminationStatus)
+  let proc = NSTask()
+  var args = Process.arguments
+  proc.launchPath = args[0]
+  args.append("--debug")
+  proc.arguments = args
+  proc.standardError = NSPipe()
+  proc.launch()
+  XRecord_Bridge.installSignalHandler(proc.processIdentifier)
+  proc.waitUntilExit()
+  exit(proc.terminationStatus)
 }
 
 // Start a real capture
@@ -179,6 +182,9 @@ if !done {
   NSLog("Stopping recording...")
 
   capture.stop()
+  if qt.value {
+    XRecord_Bridge.stopQuickTime()
+  }
 }
 
 if locked {
