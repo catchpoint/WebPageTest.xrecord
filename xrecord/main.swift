@@ -9,6 +9,17 @@
 import Foundation
 import AVFoundation
 
+let lock = NSDistributedLock(path: "/tmp/xrecord.lck")
+var locked = false
+
+func quit(exitCode: Int32!) {
+  XRecord_Bridge.stopQuickTime()
+  if locked {
+    lock!.unlock()
+  }
+  exit(exitCode);
+}
+
 let cli = CommandLine()
 
 let list = BoolOption(shortFlag: "l", longFlag: "list",
@@ -25,17 +36,19 @@ let qt = BoolOption(shortFlag: "q", longFlag: "quicktime",
     helpMessage: "Start QuickTime in the background (necessary for iOS recording).")
 let time = IntOption(shortFlag: "t", longFlag: "time", required: false,
     helpMessage: "Recording time in seconds (records until stopped if not specified).")
+let quality = StringOption(shortFlag: "u", longFlag: "quality", required: false,
+  helpMessage: "Recording quality (low, medium, high, photo - defaults to high)")
 let debug = BoolOption(shortFlag: "d", longFlag: "debug",
     helpMessage: "Display debugging info to stderr.")
 let help = BoolOption(shortFlag: "h", longFlag: "help",
     helpMessage: "Prints a help message.")
 
-cli.addOptions(list, name, id, outFile, force, qt, time, debug, help)
+cli.addOptions(list, name, id, outFile, force, qt, time, quality, debug, help)
 let (success, error) = cli.parse()
 if !success {
   println(error!)
   cli.printUsage()
-  exit(EX_USAGE)
+  quit(EX_USAGE)
 }
 
 // Check to make sure a sane combination of options were specified
@@ -50,51 +63,7 @@ if !list.value {
 }
 if !ok {
   cli.printUsage()
-  exit(EX_USAGE)
-}
-
-// See if we need to launch quicktime in the background
-if qt.value {
-  XRecord_Bridge.startQuickTime()
-}
-
-let capture = Capture()
-if list.value {
-  println("Available capture devices:")
-  capture.listDevices()
-  if qt.value {
-    XRecord_Bridge.stopQuickTime()
-  }
-  exit(0)
-}
-
-// Set up the input device
-if id.value != nil {
-  if !capture.setDeviceById(id.value) {
-    println("Device not found")
-    exit(1)
-  }
-}
-if name.value != nil {
-  if !capture.setDeviceByName(name.value) {
-    println("Device not found")
-    exit(1)
-  }
-}
-
-// See if a video file already exists in the given location
-if outFile.value != nil && NSFileManager.defaultManager().fileExistsAtPath(outFile.value!) {
-  if force.value {
-    var error:NSError?
-    NSFileManager.defaultManager().removeItemAtPath(outFile.value!, error: &error)
-    if (error != nil) {
-      println("Error overwriting existing file (\(error)).")
-      exit(2)
-    }
-  } else {
-    println("The output file already exists, please use a different file: \(outFile.value!)")
-    exit(2)
-  }
+  quit(EX_USAGE)
 }
 
 // If we were not launched with the debug flag, re-spawn and suppress stderr
@@ -108,16 +77,13 @@ if !debug.value {
   proc.launch()
   XRecord_Bridge.installSignalHandler(proc.processIdentifier)
   proc.waitUntilExit()
-  exit(proc.terminationStatus)
+  quit(proc.terminationStatus)
 }
 
-// Start a real capture
 XRecord_Bridge.installSignalHandler(0)
 
 // Use a distributed lock to make sure only one instance is capturing at a time.
 // Currently OSX only supports recording from a single device at a time.
-let lock = NSDistributedLock(path: "/tmp/xrecord.lck")
-var locked = false
 var done = false
 var started_wait = false
 let lock_start = NSDate()
@@ -130,7 +96,7 @@ do {
     if elapsed > 300 {
       println("Timed out waiting to acquire lock")
       NSLog("Timed out waiting to acquire lock")
-      exit(2)
+      quit(2)
     }
     
     // if the lock was originally acquired over 10 minutes ago, break it
@@ -150,6 +116,55 @@ do {
   }
 } while !locked && !done
 
+// See if we need to launch quicktime in the background
+if qt.value {
+  XRecord_Bridge.startQuickTime()
+}
+
+let capture = Capture()
+if list.value {
+  println("Available capture devices:")
+  capture.listDevices()
+  if qt.value {
+    XRecord_Bridge.stopQuickTime()
+  }
+  quit(0)
+}
+
+// Set up the input device
+if quality.value != nil {
+  capture.setQuality(quality.value);
+}
+
+if id.value != nil {
+  if !capture.setDeviceById(id.value) {
+    println("Device not found")
+    quit(1)
+  }
+}
+if name.value != nil {
+  if !capture.setDeviceByName(name.value) {
+    println("Device not found")
+    quit(1)
+  }
+}
+
+// See if a video file already exists in the given location
+if outFile.value != nil && NSFileManager.defaultManager().fileExistsAtPath(outFile.value!) {
+  if force.value {
+    var error:NSError?
+    NSFileManager.defaultManager().removeItemAtPath(outFile.value!, error: &error)
+    if (error != nil) {
+      println("Error overwriting existing file (\(error)).")
+      quit(2)
+    }
+  } else {
+    println("The output file already exists, please use a different file: \(outFile.value!)")
+    quit(2)
+  }
+}
+
+// Start a real capture
 if !done {
   NSLog("Starting capture....")
   capture.start(outFile.value)
@@ -182,14 +197,9 @@ if !done {
   NSLog("Stopping recording...")
 
   capture.stop()
-  if qt.value {
-    XRecord_Bridge.stopQuickTime()
-  }
-}
-
-if locked {
-  lock!.unlock()
 }
 
 println("Done")
 NSLog("Done")
+
+quit(0);

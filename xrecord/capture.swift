@@ -34,6 +34,18 @@ func listDevices() {
         println("\(deviceID): \(deviceName)")
     }
 }
+  
+func setQuality(quality: String!) {
+  if (quality == "low") {
+    self.session.sessionPreset = AVCaptureSessionPresetLow;
+  } else if (quality == "medium") {
+    self.session.sessionPreset = AVCaptureSessionPresetMedium;
+  } else if (quality == "high") {
+    self.session.sessionPreset = AVCaptureSessionPresetHigh;
+  } else if (quality == "photo") {
+    self.session.sessionPreset = AVCaptureSessionPresetPhoto;
+  }
+}
 
 func setDeviceByName(name: String!) -> Bool {
     var found : Bool = false

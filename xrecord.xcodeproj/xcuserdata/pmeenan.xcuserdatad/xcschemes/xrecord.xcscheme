@@ -60,8 +60,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--name=&quot;Pat&apos;s iPhone&quot;"
-            isEnabled = "NO">
+            argument = "--name=&quot;pmeenan&#x2019;s iPhone&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--quality=&quot;medium&quot;"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--debug"
@@ -69,11 +73,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--force"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--time=10"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--quicktime"
@@ -81,11 +85,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--out=&quot;/Users/pmeenan/video/iphone.mp4&quot;"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--list"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
