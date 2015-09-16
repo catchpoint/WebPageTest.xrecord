@@ -47,13 +47,14 @@ void onUncaughtException(NSException* exception)
     }
 }
 
-+ (void) stopQuickTime
++ (void) stopQuickTime:(BOOL)force
 {
   @autoreleasepool
   {
-    if (started_quicktime == YES) {
+    if (force || started_quicktime == YES) {
       QuickTimeApplication * qt = [SBApplication applicationWithBundleIdentifier:@"com.apple.QuickTimePlayerX"];
       [qt quitSaving:QuickTimeSaveOptionsNo];
+      started_quicktime = NO;
     }
   }
 }

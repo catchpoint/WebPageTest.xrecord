@@ -13,7 +13,7 @@
 
 @interface XRecord_Bridge : NSObject
 + (void) startQuickTime;
-+ (void) stopQuickTime;
++ (void) stopQuickTime:(BOOL)force;
 + (void) enableScreenCaptureDevices;
 + (void) installSignalHandler:(int)child_pid;
 + (BOOL) didSignal;
