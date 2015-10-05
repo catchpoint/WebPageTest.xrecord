@@ -13,7 +13,6 @@ let lock = NSDistributedLock(path: "/tmp/xrecord.lck")
 var locked = false
 
 func quit(exitCode: Int32!) {
-  XRecord_Bridge.stopQuickTime(false)
   if locked {
     lock!.unlock()
   }
@@ -46,7 +45,7 @@ let help = BoolOption(shortFlag: "h", longFlag: "help",
 cli.addOptions(list, name, id, outFile, force, qt, time, quality, debug, help)
 let (success, error) = cli.parse()
 if !success {
-  println(error!)
+  print(error!)
   cli.printUsage()
   quit(EX_USAGE)
 }
@@ -87,14 +86,14 @@ XRecord_Bridge.installSignalHandler(0)
 var done = false
 var started_wait = false
 let lock_start = NSDate()
-do {
+repeat {
   locked = lock!.tryLock()
   if !locked {
     // see if we timed out waiting for the lock (5 minutes - TODO: make it configurable)
     let now = NSDate()
     let elapsed: Double = now.timeIntervalSinceDate(lock_start)
     if elapsed > 300 {
-      println("Timed out waiting to acquire lock")
+      print("Timed out waiting to acquire lock")
       NSLog("Timed out waiting to acquire lock")
       quit(2)
     }
@@ -109,7 +108,7 @@ do {
   }
   if !locked && !done {
     if !started_wait {
-      println("Waiting to acquire recording lock (only one recording is possible at a time)...")
+      print("Waiting to acquire recording lock (only one recording is possible at a time)...")
       started_wait = true
     }
     sleep(1)
@@ -123,7 +122,7 @@ if qt.value {
 
 let capture = Capture()
 if list.value {
-  println("Available capture devices:")
+  print("Available capture devices:")
   capture.listDevices()
   quit(0)
 }
@@ -133,30 +132,41 @@ if quality.value != nil {
   capture.setQuality(quality.value);
 }
 
+var connected = false
 if id.value != nil {
-  if !capture.setDeviceById(id.value) {
-    println("Device not found")
-    quit(1)
+  if capture.setDeviceById(id.value) {
+    connected = true
   }
 }
 if name.value != nil {
-  if !capture.setDeviceByName(name.value) {
-    println("Device not found")
-    quit(1)
+  if capture.setDeviceByName(name.value) {
+    connected = true
   }
+}
+if !connected {
+  print("Device not found")
+  // kill quicktime in case it got wedged
+  if qt.value {
+    XRecord_Bridge.stopQuickTime(true)
+  }
+  quit(1)
 }
 
 // See if a video file already exists in the given location
 if outFile.value != nil && NSFileManager.defaultManager().fileExistsAtPath(outFile.value!) {
   if force.value {
     var error:NSError?
-    NSFileManager.defaultManager().removeItemAtPath(outFile.value!, error: &error)
+    do {
+      try NSFileManager.defaultManager().removeItemAtPath(outFile.value!)
+    } catch var error1 as NSError {
+      error = error1
+    }
     if (error != nil) {
-      println("Error overwriting existing file (\(error)).")
+      print("Error overwriting existing file (\(error)).")
       quit(2)
     }
   } else {
-    println("The output file already exists, please use a different file: \(outFile.value!)")
+    print("The output file already exists, please use a different file: \(outFile.value!)")
     quit(2)
   }
 }
@@ -168,16 +178,16 @@ if !done {
 
   let start = NSDate()
   if time.value != nil && time.value > 0 {
-      println("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
+      print("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
       NSLog("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
       sleep(UInt32(time.value!))
   } else {
-      println("Recording started.  Hit ctrl-C to stop.")
+      print("Recording started.  Hit ctrl-C to stop.")
       NSLog("Recording started.  Hit ctrl-C to stop.")
   }
 
   // Loop until we get a ctrl-C or the time limit expires
-  do {
+  repeat {
       usleep(100)
       if XRecord_Bridge.didSignal() {
           done = true
@@ -190,16 +200,13 @@ if !done {
       }
   } while !done
 
-  println("Stopping recording...")
+  print("Stopping recording...")
   NSLog("Stopping recording...")
 
   capture.stop()
-  if qt.value {
-    XRecord_Bridge.stopQuickTime(true)
-  }
 }
 
-println("Done")
+print("Done")
 NSLog("Done")
 
 quit(0);

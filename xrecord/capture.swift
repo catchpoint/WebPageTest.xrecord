@@ -26,12 +26,12 @@ override init() {
 }
     
 func listDevices() {
-    var devices: NSArray = AVCaptureDevice.devices()
+    let devices: NSArray = AVCaptureDevice.devices()
     for object:AnyObject in devices {
         let device = object as! AVCaptureDevice
         let deviceID = device.uniqueID
         let deviceName = device.localizedName
-        println("\(deviceID): \(deviceName)")
+        print("\(deviceID): \(deviceName)")
     }
 }
   
@@ -49,12 +49,17 @@ func setQuality(quality: String!) {
 
 func setDeviceByName(name: String!) -> Bool {
     var found : Bool = false
-    var devices: NSArray = AVCaptureDevice.devices()
+    let devices: NSArray = AVCaptureDevice.devices()
     for object:AnyObject in devices {
         let captureDevice = object as! AVCaptureDevice
         if captureDevice.localizedName == name {
             var err : NSError? = nil
-            self.input = AVCaptureDeviceInput(device: captureDevice, error: &err)
+            do {
+                self.input = try AVCaptureDeviceInput(device: captureDevice)
+            } catch let error as NSError {
+                err = error
+                self.input = nil
+            }
             if err == nil {
                 found = true
             }
@@ -65,12 +70,17 @@ func setDeviceByName(name: String!) -> Bool {
     
 func setDeviceById(id: String!) -> Bool {
     var found : Bool = false
-    var devices: NSArray = AVCaptureDevice.devices()
+    let devices: NSArray = AVCaptureDevice.devices()
     for object:AnyObject in devices {
         let captureDevice = object as! AVCaptureDevice
         if captureDevice.uniqueID == id {
             var err : NSError? = nil
-            self.input = AVCaptureDeviceInput(device: captureDevice, error: &err)
+            do {
+                self.input = try AVCaptureDeviceInput(device: captureDevice)
+            } catch let error as NSError {
+                err = error
+                self.input = nil
+            }
             if err == nil {
                 found = true
             }
