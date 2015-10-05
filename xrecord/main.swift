@@ -13,6 +13,7 @@ let lock = NSDistributedLock(path: "/tmp/xrecord.lck")
 var locked = false
 
 func quit(exitCode: Int32!) {
+  XRecord_Bridge.stopQuickTime(false)
   if locked {
     lock!.unlock()
   }
@@ -204,6 +205,9 @@ if !done {
   NSLog("Stopping recording...")
 
   capture.stop()
+  if qt.value {
+    XRecord_Bridge.stopQuickTime(true)
+  }
 }
 
 print("Done")
