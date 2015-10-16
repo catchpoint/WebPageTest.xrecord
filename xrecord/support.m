@@ -31,20 +31,21 @@ void onUncaughtException(NSException* exception)
 @implementation XRecord_Bridge
 + (void) startQuickTime
 {
-    @autoreleasepool
-    {
-        BOOL already_running = NO;
-        QuickTimeApplication * qt = [SBApplication applicationWithBundleIdentifier:@"com.apple.QuickTimePlayerX"];
-        SBElementArray * documents = [qt documents];
-        for (QuickTimeDocument* document in documents) {
-            if ([[document name] isEqualToString:@"Audio Recording"])
-                already_running = YES;
-        }
-        if (already_running == NO) {
-            started_quicktime = YES;
-            [qt newAudioRecording];
-        }
+  @autoreleasepool
+  {
+    BOOL already_running = NO;
+    QuickTimeApplication * qt = [SBApplication applicationWithBundleIdentifier:@"com.apple.QuickTimePlayerX"];
+    SBElementArray * documents = [qt documents];
+    for (QuickTimeDocument* document in documents) {
+      if ([[document name] isEqualToString:@"Audio Recording"])
+        already_running = YES;
     }
+    if (already_running == NO) {
+      started_quicktime = YES;
+      [qt newAudioRecording];
+      sleep(1);
+    }
+  }
 }
 
 + (void) stopQuickTime:(BOOL)force
