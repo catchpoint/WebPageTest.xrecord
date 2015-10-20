@@ -9,10 +9,12 @@
 #import "support.h"
 #import "QuickTime.h"
 #import <CoreMediaIO/CMIOHardware.h>
+@import Foundation;
 
 BOOL signaled = NO;
 BOOL started_quicktime = NO;
 int child_process = 0;
+
 static void signalHandler(int sig)
 {
     signaled = YES;
@@ -33,18 +35,12 @@ void onUncaughtException(NSException* exception)
 {
   @autoreleasepool
   {
-    BOOL already_running = NO;
+    // Start quicktime and a dummy audio recording (needed to trigger the exposing of iOS devices)
     QuickTimeApplication * qt = [SBApplication applicationWithBundleIdentifier:@"com.apple.QuickTimePlayerX"];
-    SBElementArray * documents = [qt documents];
-    for (QuickTimeDocument* document in documents) {
-      if ([[document name] isEqualToString:@"Audio Recording"])
-        already_running = YES;
-    }
-    if (already_running == NO) {
-      started_quicktime = YES;
-      [qt newAudioRecording];
-      sleep(1);
-    }
+    started_quicktime = YES;
+    sleep(1);
+    [qt newAudioRecording];
+    sleep(1);
   }
 }
 
@@ -56,6 +52,20 @@ void onUncaughtException(NSException* exception)
       QuickTimeApplication * qt = [SBApplication applicationWithBundleIdentifier:@"com.apple.QuickTimePlayerX"];
       [qt quitSaving:QuickTimeSaveOptionsNo];
       started_quicktime = NO;
+      sleep(2);
+
+      // Kill all instances of PTPCamera which can sometimes get wedged and prevent iOS devices from showing up
+      NSTask *task = [NSTask new];
+      NSPipe *std_out = [NSPipe new];
+      NSPipe *std_err = [NSPipe new];
+      task.launchPath = @"/usr/bin/killall";
+      task.arguments = @[@"PTPCamera"];
+      [task setStandardOutput:std_out];
+      [task setStandardError:std_err];
+      [task launch];
+      [task waitUntilExit];
+      
+      sleep(1);
     }
   }
 }
