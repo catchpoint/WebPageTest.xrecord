@@ -8,7 +8,6 @@
 
 #include "PluginHeaderHelper.h"
 
-
 MyInterfaceStruct** startScreenCapturePlugin()
 {
     CFUUIDRef pluginFactoryRef = CFUUIDCreateFromString(NULL,CFSTR("30010C1C-93BF-11D8-8B5B-000A95AF9C6A"));
@@ -66,7 +65,7 @@ MyInterfaceStruct** startScreenCapturePlugin()
                     //wait for plugin load max 15 sec
                     Boolean loaded = false;
                     int count = 0 ;
-                    while (!loaded || count < 15) {
+                    while (loaded != true || count > 15) {
                         loaded = CFPlugInIsLoadOnDemand(plugin);
                         usleep(1000000); // will sleep for 1 s
                         count = count+1;
