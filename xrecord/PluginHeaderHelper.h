@@ -10,6 +10,7 @@
 #define PluginHeaderHelper_hpp
 
 #include "PluginHeader.h"
+#include <unistd.h>
 
 void stopScreenCapturePlugin(MyInterfaceStruct **);
 
