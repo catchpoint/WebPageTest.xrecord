@@ -88,9 +88,6 @@ let lock_start = NSDate()
 // See if we need to launch quicktime in the background
 if qt.value {
     xRecord_Bridge.startScreenCapturePlugin();
-    //!! any suggestion accepted
-    //this is need here we need to wait for start phase of plugin
-    sleep(5);
 }
 
 let capture = Capture()
