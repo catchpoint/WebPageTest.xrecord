@@ -65,7 +65,7 @@ MyInterfaceStruct** startScreenCapturePlugin()
                     //wait for plugin load max 15 sec
                     Boolean loaded = false;
                     int count = 0 ;
-                    while (loaded != true || count > 15) {
+                    while (loaded != true && count < 15) {
                         loaded = CFPlugInIsLoadOnDemand(plugin);
                         usleep(1000000); // will sleep for 1 s
                         count = count+1;
