@@ -29,7 +29,7 @@ let outFile = StringOption(shortFlag: "o", longFlag: "out", required: false,
 let force = BoolOption(shortFlag: "f", longFlag: "force",
     helpMessage: "Overwrite existing files.")
 let qt = BoolOption(shortFlag: "q", longFlag: "quicktime",
-    helpMessage: "Start QuickTime in the background (necessary for iOS recording).")
+    helpMessage: "Include QuickTime devices (necessary for iOS recording).")
 let time = IntOption(shortFlag: "t", longFlag: "time", required: false,
     helpMessage: "Recording time in seconds (records until stopped if not specified).")
 let quality = StringOption(shortFlag: "u", longFlag: "quality", required: false,

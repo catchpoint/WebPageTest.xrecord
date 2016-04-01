@@ -91,7 +91,7 @@ internal extension String {
       if c == splitBy && (maxSplits == 0 || numSplits < maxSplits) {
         s.append(buf)
         buf = ""
-        numSplits++
+        numSplits += 1
         continue
       }
       
@@ -117,7 +117,8 @@ internal extension String {
     var s = self
     var currentLength = self.characters.count
     
-    while currentLength++ < width {
+    while currentLength < width {
+      currentLength += 1
       s.append(padBy)
     }
     
