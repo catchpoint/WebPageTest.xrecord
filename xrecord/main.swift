@@ -9,14 +9,10 @@
 import Foundation
 import AVFoundation
 
-let lock = NSDistributedLock(path: "/tmp/xrecord.lck")
-var locked = false
+let xRecord_Bridge: XRecord_Bridge = XRecord_Bridge();
 
 func quit(exitCode: Int32!) {
-  XRecord_Bridge.stopQuickTime(false)
-  if locked {
-    lock!.unlock()
-  }
+    xRecord_Bridge.stopScreenCapturePlugin();
   exit(exitCode);
 }
 
@@ -75,50 +71,23 @@ if !debug.value {
   proc.arguments = args
   proc.standardError = NSPipe()
   proc.launch()
-  XRecord_Bridge.installSignalHandler(proc.processIdentifier)
+  xRecord_Bridge.installSignalHandler(proc.processIdentifier)
   proc.waitUntilExit()
   quit(proc.terminationStatus)
 }
 
-XRecord_Bridge.installSignalHandler(0)
+xRecord_Bridge.installSignalHandler(0)
 
 // Use a distributed lock to make sure only one instance is capturing at a time.
 // Currently OSX only supports recording from a single device at a time.
 var done = false
 var started_wait = false
 let lock_start = NSDate()
-repeat {
-  locked = lock!.tryLock()
-  if !locked {
-    // see if we timed out waiting for the lock (5 minutes - TODO: make it configurable)
-    let now = NSDate()
-    let elapsed: Double = now.timeIntervalSinceDate(lock_start)
-    if elapsed > 300 {
-      print("Timed out waiting to acquire lock")
-      NSLog("Timed out waiting to acquire lock")
-      quit(2)
-    }
-    
-    // if the lock was originally acquired over 10 minutes ago, break it
-    let lock_time = lock!.lockDate
-    let lock_elapsed: Double = now.timeIntervalSinceDate(lock_time)
-    if lock_elapsed > 600 {
-      NSLog("Breaking existing lock")
-      lock!.breakLock()
-    }
-  }
-  if !locked && !done {
-    if !started_wait {
-      print("Waiting to acquire recording lock (only one recording is possible at a time)...")
-      started_wait = true
-    }
-    sleep(1)
-  }
-} while !locked && !done
+
 
 // See if we need to launch quicktime in the background
 if qt.value {
-  XRecord_Bridge.startQuickTime()
+    xRecord_Bridge.startScreenCapturePlugin();
 }
 
 let capture = Capture()
@@ -147,9 +116,6 @@ if name.value != nil {
 if !connected {
   print("Device not found")
   // kill quicktime in case it got wedged
-  if qt.value {
-    XRecord_Bridge.stopQuickTime(true)
-  }
   quit(1)
 }
 
@@ -190,7 +156,7 @@ if !done {
   // Loop until we get a ctrl-C or the time limit expires
   repeat {
       usleep(100)
-      if XRecord_Bridge.didSignal() {
+      if xRecord_Bridge.didSignal() {
           done = true
       } else if time.value != nil && time.value > 0 {
           let now = NSDate()
@@ -206,7 +172,7 @@ if !done {
 
   capture.stop()
   if qt.value {
-    XRecord_Bridge.stopQuickTime(true)
+    xRecord_Bridge.stopScreenCapturePlugin();
   }
 }
 

@@ -22,7 +22,7 @@ override init() {
     self.session.sessionPreset = AVCaptureSessionPresetHigh
 
     // Enable screen capture devices in AV Foundation
-    XRecord_Bridge.enableScreenCaptureDevices()
+    xRecord_Bridge.enableScreenCaptureDevices()
 }
     
 func listDevices() {

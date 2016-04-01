@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0F3CE70F1A9CCBED001F432C /* support.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F3CE70E1A9CCBED001F432C /* support.m */; };
+		0F3CE70F1A9CCBED001F432C /* support.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0F3CE70E1A9CCBED001F432C /* support.mm */; };
 		0F54EDD61A9F6CDE005C41AA /* capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F54EDD51A9F6CDE005C41AA /* capture.swift */; };
 		0FB9639D1A38C13000EC40AE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB9639C1A38C13000EC40AE /* main.swift */; };
 		0FB963A71A38C2C700EC40AE /* CommandLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB963A31A38C2C700EC40AE /* CommandLine.swift */; };
 		0FB963A81A38C2C700EC40AE /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB963A51A38C2C700EC40AE /* Option.swift */; };
 		0FB963A91A38C2C700EC40AE /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB963A61A38C2C700EC40AE /* StringExtensions.swift */; };
+		9AE269B81CABF509008D8F75 /* PluginHeaderHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AE269B61CABF509008D8F75 /* PluginHeaderHelper.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,16 +30,18 @@
 
 /* Begin PBXFileReference section */
 		0F3CE70D1A9CCBED001F432C /* xrecord-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xrecord-Bridging-Header.h"; sourceTree = "<group>"; };
-		0F3CE70E1A9CCBED001F432C /* support.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = support.m; sourceTree = "<group>"; };
+		0F3CE70E1A9CCBED001F432C /* support.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = support.mm; sourceTree = "<group>"; };
 		0F3CE7101A9CCD34001F432C /* support.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = support.h; sourceTree = "<group>"; };
 		0F54EDD51A9F6CDE005C41AA /* capture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = capture.swift; sourceTree = "<group>"; };
 		0F5EB0971A9FC08E0029F654 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		0FA89A321AAF2F9F0075B71D /* QuickTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickTime.h; sourceTree = "<group>"; };
 		0FB963991A38C13000EC40AE /* xrecord */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xrecord; sourceTree = BUILT_PRODUCTS_DIR; };
 		0FB9639C1A38C13000EC40AE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		0FB963A31A38C2C700EC40AE /* CommandLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CommandLine.swift; path = CommandLine/CommandLine.swift; sourceTree = SOURCE_ROOT; };
 		0FB963A51A38C2C700EC40AE /* Option.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Option.swift; path = CommandLine/Option.swift; sourceTree = SOURCE_ROOT; };
 		0FB963A61A38C2C700EC40AE /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StringExtensions.swift; path = CommandLine/StringExtensions.swift; sourceTree = SOURCE_ROOT; };
+		9AE269B51CABF509008D8F75 /* PluginHeaderHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PluginHeaderHelper.h; sourceTree = "<group>"; };
+		9AE269B61CABF509008D8F75 /* PluginHeaderHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PluginHeaderHelper.cpp; sourceTree = "<group>"; };
+		9AE269B71CABF509008D8F75 /* PluginHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PluginHeader.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,10 +74,12 @@
 		0FB9639B1A38C13000EC40AE /* xrecord */ = {
 			isa = PBXGroup;
 			children = (
-				0FA89A321AAF2F9F0075B71D /* QuickTime.h */,
+				9AE269B51CABF509008D8F75 /* PluginHeaderHelper.h */,
+				9AE269B61CABF509008D8F75 /* PluginHeaderHelper.cpp */,
+				9AE269B71CABF509008D8F75 /* PluginHeader.h */,
 				0FB963AA1A38C2D300EC40AE /* CommandLine */,
 				0FB9639C1A38C13000EC40AE /* main.swift */,
-				0F3CE70E1A9CCBED001F432C /* support.m */,
+				0F3CE70E1A9CCBED001F432C /* support.mm */,
 				0F3CE70D1A9CCBED001F432C /* xrecord-Bridging-Header.h */,
 				0F3CE7101A9CCD34001F432C /* support.h */,
 				0F54EDD51A9F6CDE005C41AA /* capture.swift */,
@@ -152,11 +157,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				0FB963A91A38C2C700EC40AE /* StringExtensions.swift in Sources */,
-				0F3CE70F1A9CCBED001F432C /* support.m in Sources */,
+				0F3CE70F1A9CCBED001F432C /* support.mm in Sources */,
 				0FB9639D1A38C13000EC40AE /* main.swift in Sources */,
 				0FB963A81A38C2C700EC40AE /* Option.swift in Sources */,
 				0F54EDD61A9F6CDE005C41AA /* capture.swift in Sources */,
 				0FB963A71A38C2C700EC40AE /* CommandLine.swift in Sources */,
+				9AE269B81CABF509008D8F75 /* PluginHeaderHelper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
