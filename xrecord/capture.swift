@@ -26,8 +26,8 @@ override init() {
 }
     
 func listDevices() {
-    let devices: NSArray = AVCaptureDevice.devices()
-    for object:AnyObject in devices {
+    let devices: NSArray = AVCaptureDevice.devices() as NSArray
+    for object:AnyObject in devices as [AnyObject] {
         let device = object as! AVCaptureDevice
         let deviceID = device.uniqueID
         let deviceName = device.localizedName
@@ -35,7 +35,7 @@ func listDevices() {
     }
 }
   
-func setQuality(quality: String!) {
+func setQuality(_ quality: String!) {
   if (quality == "low") {
     self.session.sessionPreset = AVCaptureSessionPresetLow;
   } else if (quality == "medium") {
@@ -47,10 +47,10 @@ func setQuality(quality: String!) {
   }
 }
 
-func setDeviceByName(name: String!) -> Bool {
+func setDeviceByName(_ name: String!) -> Bool {
     var found : Bool = false
-    let devices: NSArray = AVCaptureDevice.devices()
-    for object:AnyObject in devices {
+    let devices: NSArray = AVCaptureDevice.devices() as NSArray
+    for object:AnyObject in devices as [AnyObject] {
         let captureDevice = object as! AVCaptureDevice
         if captureDevice.localizedName == name {
             var err : NSError? = nil
@@ -68,10 +68,10 @@ func setDeviceByName(name: String!) -> Bool {
     return found
 }
     
-func setDeviceById(id: String!) -> Bool {
+func setDeviceById(_ id: String!) -> Bool {
     var found : Bool = false
-    let devices: NSArray = AVCaptureDevice.devices()
-    for object:AnyObject in devices {
+    let devices: NSArray = AVCaptureDevice.devices() as NSArray
+    for object:AnyObject in devices as [AnyObject] {
         let captureDevice = object as! AVCaptureDevice
         if captureDevice.uniqueID == id {
             var err : NSError? = nil
@@ -89,7 +89,7 @@ func setDeviceById(id: String!) -> Bool {
     return found
 }
     
-func start(file: String!) -> Bool {
+func start(_ file: String!) -> Bool {
     var started : Bool = false
     if self.session.canAddInput(self.input) {
         self.session.addInput(self.input)
@@ -97,7 +97,7 @@ func start(file: String!) -> Bool {
         if self.session.canAddOutput(self.output) {
             self.session.addOutput(self.output)
             self.session.startRunning()
-            self.output.startRecordingToOutputFileURL(NSURL.fileURLWithPath(file), recordingDelegate: self)
+            self.output.startRecording(toOutputFileURL: URL(fileURLWithPath: file), recordingDelegate: self)
             started = true
         }
     }
@@ -109,17 +109,17 @@ func stop() {
     self.session.stopRunning()
 }
 
-func captureOutput(captureOutput: AVCaptureFileOutput!,
-    didStartRecordingToOutputFileAtURL fileURL: NSURL!,
-    fromConnections connections: [AnyObject]!) {
+func capture(_ captureOutput: AVCaptureFileOutput!,
+    didStartRecordingToOutputFileAt fileURL: URL!,
+    fromConnections connections: [Any]!) {
     NSLog("captureOutput Started callback");
     self.started = true
 }
     
-func captureOutput(captureOutput: AVCaptureFileOutput!,
-    didFinishRecordingToOutputFileAtURL outputFileURL: NSURL!,
-    fromConnections connections: [AnyObject]!,
-    error: NSError!) {
+func capture(_ captureOutput: AVCaptureFileOutput!,
+    didFinishRecordingToOutputFileAt outputFileURL: URL!,
+    fromConnections connections: [Any]!,
+    error: Error!) {
     NSLog("captureOutput Finished callback")
     self.finished = true
 }

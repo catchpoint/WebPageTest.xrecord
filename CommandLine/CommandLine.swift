@@ -41,9 +41,9 @@ let ArgumentAttacher: Character = "="
  * If any required options are missing or if an invalid value is found, parse() will return
  * false. You can then call printUsage() to output an automatically-generated usage message.
  */
-public class CommandLine {
-  private var _arguments: [String]
-  private var _options: [Option] = [Option]()
+open class CommandLine {
+  fileprivate var _arguments: [String]
+  fileprivate var _options: [Option] = [Option]()
   
   /**
    * Initializes a CommandLine object.
@@ -53,7 +53,7 @@ public class CommandLine {
    *
    * - returns: An initalized CommandLine object.
    */
-  public init(arguments: [String] = Process.arguments) {
+  public init(arguments: [String] = Swift.CommandLine.arguments) {
     self._arguments = arguments
     
     /* Initialize locale settings from the environment */
@@ -61,7 +61,7 @@ public class CommandLine {
   }
   
   /* Returns all argument values from flagIndex to the next flag or the end of the argument array. */
-  private func _getFlagValues(flagIndex flagIndex: Int) -> [String] {
+  fileprivate func _getFlagValues(flagIndex: Int) -> [String] {
     var args: [String] = [String]()
     var skipFlagChecks = false
     
@@ -95,7 +95,7 @@ public class CommandLine {
    *
    * - parameter option: The option to add.
    */
-  public func addOption(option: Option) {
+  open func addOption(_ option: Option) {
     _options.append(option)
   }
   
@@ -104,7 +104,7 @@ public class CommandLine {
    *
    * - parameter options: An array containing the options to add.
    */
-  public func addOptions(options: [Option]) {
+  open func addOptions(_ options: [Option]) {
     _options += options
   }
   
@@ -113,7 +113,7 @@ public class CommandLine {
    *
    * - parameter options: The options to add.
    */
-  public func addOptions(options: Option...) {
+  open func addOptions(_ options: Option...) {
     _options += options
   }
   
@@ -122,7 +122,7 @@ public class CommandLine {
    *
    * - parameter options: An array containing the options to set.
    */
-  public func setOptions(options: [Option]) {
+  open func setOptions(_ options: [Option]) {
     _options = options
   }
   
@@ -131,7 +131,7 @@ public class CommandLine {
    *
    * - parameter options: The options to set.
    */
-  public func setOptions(options: Option...) {
+  open func setOptions(_ options: Option...) {
     _options = options
   }
   
@@ -141,9 +141,9 @@ public class CommandLine {
    * - returns: True if all arguments were parsed successfully, false if any option had an
    *   invalid value or if a required option was missing.
    */
-  public func parse() -> (Bool, String?) {
+  open func parse() -> (Bool, String?) {
     
-    for (idx, arg) in _arguments.enumerate() {
+    for (idx, arg) in _arguments.enumerated() {
       if arg == ArgumentStopper {
         break
       }
@@ -183,7 +183,7 @@ public class CommandLine {
       
       /* Flags that do not take any arguments can be concatenated */
       if !flagMatched && !arg.hasPrefix(LongOptionPrefix) {
-        for (i, c) in flag.characters.enumerate() {
+        for (i, c) in flag.characters.enumerated() {
           let flagLength = flag.characters.count
           for option in _options {
             if String(c) == option.shortFlag {
@@ -213,7 +213,7 @@ public class CommandLine {
   }
   
   /** Prints a usage message to stdout. */
-  public func printUsage() {
+  open func printUsage() {
     let name = _arguments[0]
     
     var flagWidth = 0

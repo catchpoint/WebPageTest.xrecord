@@ -8,10 +8,34 @@
 
 import Foundation
 import AVFoundation
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 let xRecord_Bridge: XRecord_Bridge = XRecord_Bridge();
 
-func quit(exitCode: Int32!) {
+func quit(_ exitCode: Int32!) {
     xRecord_Bridge.stopScreenCapturePlugin();
   exit(exitCode);
 }
@@ -64,12 +88,12 @@ if !ok {
 
 // If we were not launched with the debug flag, re-spawn and suppress stderr
 if !debug.value {
-  let proc = NSTask()
-  var args = Process.arguments
+  let proc = Process()
+  var args = Swift.CommandLine.arguments
   proc.launchPath = args[0]
   args.append("--debug")
   proc.arguments = args
-  proc.standardError = NSPipe()
+  proc.standardError = Pipe()
   proc.launch()
   xRecord_Bridge.installSignalHandler(proc.processIdentifier)
   proc.waitUntilExit()
@@ -82,7 +106,7 @@ xRecord_Bridge.installSignalHandler(0)
 // Currently OSX only supports recording from a single device at a time.
 var done = false
 var started_wait = false
-let lock_start = NSDate()
+let lock_start = Date()
 
 
 // See if we need to launch quicktime in the background
@@ -120,11 +144,11 @@ if !connected {
 }
 
 // See if a video file already exists in the given location
-if outFile.value != nil && NSFileManager.defaultManager().fileExistsAtPath(outFile.value!) {
+if outFile.value != nil && FileManager.default.fileExists(atPath: outFile.value!) {
   if force.value {
     var error:NSError?
     do {
-      try NSFileManager.defaultManager().removeItemAtPath(outFile.value!)
+      try FileManager.default.removeItem(atPath: outFile.value!)
     } catch var error1 as NSError {
       error = error1
     }
@@ -143,7 +167,7 @@ if !done {
   NSLog("Starting capture....")
   capture.start(outFile.value)
 
-  let start = NSDate()
+  let start = Date()
   if time.value != nil && time.value > 0 {
       print("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
       NSLog("Recording for \(time.value!) seconds.  Hit ctrl-C to stop.")
@@ -159,8 +183,8 @@ if !done {
       if xRecord_Bridge.didSignal() {
           done = true
       } else if time.value != nil && time.value > 0 {
-          let now = NSDate()
-          let elapsed: Double = now.timeIntervalSinceDate(start)
+          let now = Date()
+          let elapsed: Double = now.timeIntervalSince(start)
           if elapsed >= Double(time.value!) {
               done = true
           }
