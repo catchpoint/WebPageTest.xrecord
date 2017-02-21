@@ -18,7 +18,7 @@
 /**
  * The base class for a command-line option.
  */
-public class Option {
+open class Option {
   var shortFlag: String
   var longFlag: String
   var required: Bool
@@ -46,7 +46,7 @@ public class Option {
     self.required = required
   }
   
-  func match(values: [String]) -> Bool {
+  func match(_ values: [String]) -> Bool {
     return false
   }
 }
@@ -55,10 +55,10 @@ public class Option {
  * A boolean option. The presence of either the short or long flag will set the value to true;
  * absence of the flag(s) is equivalent to false.
  */
-public class BoolOption: Option {
-  private var _value: Bool = false
+open class BoolOption: Option {
+  fileprivate var _value: Bool = false
   
-  public var value: Bool {
+  open var value: Bool {
     return _value
   }
   
@@ -71,17 +71,17 @@ public class BoolOption: Option {
     super.init(shortFlag: shortFlag, longFlag: longFlag, required: false, helpMessage: helpMessage)
   }
   
-  override func match(values: [String]) -> Bool {
+  override func match(_ values: [String]) -> Bool {
     _value = true
     return true
   }
 }
 
 /**  An option that accepts a positive or negative integer value. */
-public class IntOption: Option {
-  private var _value: Int?
+open class IntOption: Option {
+  fileprivate var _value: Int?
   
-  public var value: Int? {
+  open var value: Int? {
     return _value
   }
   
@@ -89,7 +89,7 @@ public class IntOption: Option {
     return _value != nil
   }
   
-  override func match(values: [String]) -> Bool {
+  override func match(_ values: [String]) -> Bool {
     if values.count == 0 {
       return false
     }
@@ -107,10 +107,10 @@ public class IntOption: Option {
  * An option that represents an integer counter. Each time the short or long flag is found
  * on the command-line, the counter will be incremented.
  */
-public class CounterOption: Option {
-  private var _value: Int = 0
+open class CounterOption: Option {
+  fileprivate var _value: Int = 0
   
-  public var value: Int {
+  open var value: Int {
     return _value
   }
   
@@ -123,17 +123,17 @@ public class CounterOption: Option {
     super.init(shortFlag: shortFlag, longFlag: longFlag, required: false, helpMessage: helpMessage)
   }
   
-  override func match(values: [String]) -> Bool {
+  override func match(_ values: [String]) -> Bool {
     _value += 1
     return true
   }
 }
 
 /**  An option that accepts a positive or negative floating-point value. */
-public class DoubleOption: Option {
-  private var _value: Double?
+open class DoubleOption: Option {
+  fileprivate var _value: Double?
   
-  public var value: Double? {
+  open var value: Double? {
     return _value
   }
   
@@ -141,7 +141,7 @@ public class DoubleOption: Option {
     return _value != nil
   }
   
-  override func match(values: [String]) -> Bool {
+  override func match(_ values: [String]) -> Bool {
     if values.count == 0 {
       return false
     }
@@ -156,10 +156,10 @@ public class DoubleOption: Option {
 }
 
 /**  An option that accepts a string value. */
-public class StringOption: Option {
-  private var _value: String? = nil
+open class StringOption: Option {
+  fileprivate var _value: String? = nil
   
-  public var value: String? {
+  open var value: String? {
     return _value
   }
   
@@ -167,7 +167,7 @@ public class StringOption: Option {
     return _value != nil
   }
   
-  override func match(values: [String]) -> Bool {
+  override func match(_ values: [String]) -> Bool {
     if values.count == 0 {
       return false
     }
@@ -178,10 +178,10 @@ public class StringOption: Option {
 }
 
 /**  An option that accepts one or more string values. */
-public class MultiStringOption: Option {
-  private var _value: [String]?
+open class MultiStringOption: Option {
+  fileprivate var _value: [String]?
   
-  public var value: [String]? {
+  open var value: [String]? {
     return _value
   }
   
@@ -189,7 +189,7 @@ public class MultiStringOption: Option {
     return _value != nil
   }
   
-  override func match(values: [String]) -> Bool {
+  override func match(_ values: [String]) -> Bool {
     if values.count == 0 {
       return false
     }
@@ -200,9 +200,9 @@ public class MultiStringOption: Option {
 }
 
 /** An option that represents an enum value. */
-public class EnumOption<T:RawRepresentable where T.RawValue == String>: Option {
-  private var _value: T?
-  public var value: T? {
+open class EnumOption<T:RawRepresentable>: Option where T.RawValue == String {
+  fileprivate var _value: T?
+  open var value: T? {
     return _value
   }
   
@@ -214,7 +214,7 @@ public class EnumOption<T:RawRepresentable where T.RawValue == String>: Option {
     super.init(shortFlag: shortFlag, longFlag: longFlag, required: required, helpMessage: helpMessage)
   }
   
-  override func match(values: [String]) -> Bool {
+  override func match(_ values: [String]) -> Bool {
     if values.count == 0 {
       return false
     }
